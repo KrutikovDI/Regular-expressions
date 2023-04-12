@@ -31,26 +31,27 @@ for j, p in enumerate(contacts_dict):
                 if len(contact2_list[n]) != 0:
                     contacts_dict[j][contact1_list[n]] = contact2_list[n]
             del contacts_dict[i]
-# создаем список записей без дублей
+# собираем список записей без дублей
 contacts_list_new = []
 for n in range(len(contacts_dict)):
     contacts_list_new.append(list(contacts_dict[n].values()))
-print(contacts_list_new)
 
-# приводим все телефоны в формат +7(999)999-99-99 доб.9999
-# построчно переводит список в строку, регулиркой форматируем номера и возвращаем в список 
-contacts_list_new_telephone = []
-for indx in range(len(contacts_list_new)):
-    old_text = ' '.join(contacts_list_new[indx])
-    pattern = r"(8|\+7)\s*\(*(\d{3})\)*-*\s*(\d{3})\-*(\d{2})\-*(\d{2})(\s*)\(*([доб.]*)\s*(\d*)\)*"
-    sub_str = r"+7(\2)\3-\4-\5\6\7\8"
-    new_text = re.sub(pattern, sub_str, old_text, re.M)
-    contacts_list_new_telephone.append(new_text.split(' '))
+# переписываем все телефоны в формате +7(999)999-99-99 доб.9999,
+# для этого переводим список в строковый тип данных
+contacts_str_new = "; ".join(", ".join(l) for l in contacts_list_new)
+pattern = r"8(\d{3})(\d{3})(\d{2})(\d{2})"
+sub_str = r"+7(\1)\2-\3-\4"
+result1 = re.sub(pattern, sub_str, contacts_str_new)
+# возвращаем наш текст в список с отформатированным телефонами
+contacts_result = []
+for i in result1.split(';'):
+    contacts_result.append(i.split(','))
+print(contacts_result)
 
 # 2. Сохраните получившиеся данные в другой файл.
 # ## Код для записи файла в формате CSV:
 with open("phonebook.csv", "w", encoding='utf-8') as f:
   datawriter = csv.writer(f, delimiter=',')
   
-# ## Вместо contacts_list подставьте свой список:
-  datawriter.writerows(contacts_list_new_telephone)
+# # ## Вместо contacts_list подставьте свой список:
+  datawriter.writerows(contacts_result)
